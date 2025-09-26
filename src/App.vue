@@ -26,12 +26,14 @@ async function handleButtonClick() {
 
     <div class="config">
       <label><input type="checkbox" v-model="usePolyfill" :disabled="!isTemporalSupported || isLoading" />Use polyfill (based on <code>Intl.DateTimeFormat</code>)</label>
-      <button type="button" :disabled="isLoading" @click="handleButtonClick">Run</button>
+      <button type="button" :disabled="isLoading" @click="handleButtonClick">Run tests</button>
     </div>
 
-    <div v-if="isReady">
-      <div v-for="result in state" :key="result.calendar">
-        {{ result.calendar }}:
+    <div v-if="isReady" class="result">
+      <h2>Test result</h2>
+      <div>list of dates with a discrepancy between spec and implementation for each calendar</div>
+      <div v-for="result in state" :key="result.calendar" class="result-calendar">
+        <div><code>&quot;{{ result.calendar }}&quot;</code>:</div>
         <ul>
           <li v-for="date in result.dates" :key="date[0]"><code>{{ date[0] }}</code></li>
         </ul>
@@ -55,6 +57,19 @@ async function handleButtonClick() {
 
 .config {
   display: flex;
-  gap: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem 2rem;
+}
+
+.result > * + * {
+  margin-block-start: 2rem;
+}
+
+:where(.result ul) {
+  margin-block: 0;
+}
+
+.result-calendar > * + * {
+  margin-block-start: 0.5rem;
 }
 </style>
