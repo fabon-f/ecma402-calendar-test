@@ -30,8 +30,12 @@ async function handleButtonClick() {
     </div>
 
     <div v-if="isReady">
-      <div>discrepancies:</div>
-      <div v-for="testData in state" :key="testData[0]"><code>{{ testData[0] }}</code></div>
+      <div v-for="result in state" :key="result.calendar">
+        {{ result.calendar }}:
+        <ul>
+          <li v-for="date in result.dates" :key="date[0]"><code>{{ date[0] }}</code></li>
+        </ul>
+      </div>
     </div>
     <div v-else-if="isLoading">
       Running tests...

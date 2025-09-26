@@ -1,17 +1,26 @@
 import "temporal-spec/global";
 import { Temporal as TemporalPolyfill } from "@js-temporal/polyfill";
-import { dates as chineseDates } from "./calendars/chinese";
-import { dates as dangiDates } from "./calendars/dangi";
+import { testData as chineseTestData } from "./calendars/chinese";
+import { testData as dangiTestData } from "./calendars/dangi";
 
-export type TestData = [string, [year: number, monthCode: string, day: number]];
+export type CalendarDate = [string, [year: number, monthCode: string, day: number]];
 
-export function test(usePolyfill: boolean): TestData[] {
+export function test(usePolyfill: boolean) {
   const Temporal: typeof globalThis.Temporal = usePolyfill
     ? TemporalPolyfill
     : globalThis.Temporal;
-  const testDates = [...chineseDates, ...dangiDates];
-  return testDates.filter(([date, [_year, monthCode, day]]) => {
-    const plainDate = Temporal.PlainDate.from(date);
-    return plainDate.monthCode !== monthCode || plainDate.day !== day;
+  return [chineseTestData, dangiTestData].map((testData) => {
+    const differentDates = testData.dates.filter(
+      ([date, [_year, monthCode, day]]) => {
+        const plainDate = Temporal.PlainDate.from(date).withCalendar(
+          testData.calendar,
+        );
+        return plainDate.monthCode !== monthCode || plainDate.day !== day;
+      },
+    );
+    return {
+      calendar: testData.calendar,
+      dates: differentDates,
+    };
   });
 }
