@@ -8,12 +8,12 @@ import TestWorker from "./worker.ts?worker";
 const test = wrap<typeof testFunc>(new TestWorker());
 
 const isTemporalSupported = 'Temporal' in globalThis;
-const usePolyfill = ref(!isTemporalSupported);
+const target = ref<"temporal" | "intl">(isTemporalSupported ? "temporal" : "intl");
 
 const { state, executeImmediate, isReady, isLoading } = useAsyncState(test, [], { immediate: false });
 
 async function handleButtonClick() {
-  await executeImmediate(usePolyfill.value);
+  await executeImmediate(target.value === "intl");
 }
 </script>
 
@@ -25,7 +25,13 @@ async function handleButtonClick() {
     </div>
 
     <div class="config">
-      <label><input type="checkbox" v-model="usePolyfill" :disabled="!isTemporalSupported || isLoading" />Use polyfill (based on <code>Intl.DateTimeFormat</code>)</label>
+      <label>
+        Test target:
+        <select v-model="target" :disabled="isLoading" class="target">
+          <option value="temporal" :disabled="!isTemporalSupported">Temporal{{ isTemporalSupported ? "" : " (not supported)" }}</option>
+          <option value="intl">Intl.DateTimeFormat</option>
+        </select>
+      </label>
       <button type="button" :disabled="isLoading" @click="handleButtonClick">Run tests</button>
     </div>
 
@@ -59,6 +65,10 @@ async function handleButtonClick() {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem 2rem;
+}
+
+.target {
+  font-family: monospace;
 }
 
 .result > * + * {
