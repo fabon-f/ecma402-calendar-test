@@ -11,11 +11,11 @@ export function test(usePolyfill: boolean) {
     : globalThis.Temporal;
   return [chineseTestData, dangiTestData].map((testData) => {
     const differentDates = testData.dates.filter(
-      ([date, [_year, monthCode, day]]) => {
+      ([date, [year, monthCode, day]]) => {
         const plainDate = Temporal.PlainDate.from(date).withCalendar(
           testData.calendar,
         );
-        return plainDate.monthCode !== monthCode || plainDate.day !== day;
+        return plainDate.year !== year || plainDate.monthCode !== monthCode || plainDate.day !== day;
       },
     );
     return {
